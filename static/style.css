@@ -1,0 +1,200 @@
+/* ===== Reset & Base ===== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  color: #111827;
+}
+
+/* ===== Card Container ===== */
+.card {
+  background: #ffffff;
+  padding: 28px 30px 32px;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  width: 420px;
+  max-width: 92%;
+  text-align: center;
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card h1 {
+  margin: 0 0 8px;
+  font-size: 1.8rem;
+  color: #1e3a8a;
+  font-weight: 700;
+}
+
+.card p {
+  margin: 0 0 16px;
+  font-size: 0.95rem;
+  color: #374151;
+}
+
+/* ===== Tabs ===== */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  border-radius: 10px;
+  background: #e5e7eb;
+  color: #374151;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.tabs button:hover {
+  background: #dbeafe;
+}
+
+.tabs button.active {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+}
+
+/* ===== Sections ===== */
+.section {
+  margin: 12px 0 14px;
+}
+
+.hidden {
+  display: none;
+}
+
+/* ===== Upload Box ===== */
+#dropZone {
+  border: 2px dashed #2563eb;
+  border-radius: 12px;
+  padding: 18px 14px;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+#dropZone:hover {
+  background: #eff6ff;
+  border-color: #1d4ed8;
+}
+
+#dropZone p {
+  margin: 0;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+#dropZone input {
+  display: none;
+}
+
+/* ===== Preview Media ===== */
+#preview {
+  margin-top: 12px;
+}
+
+#preview img,
+#preview video {
+  width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== Webcam ===== */
+video#webcam {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-top: 6px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+}
+
+/* ===== Buttons ===== */
+button {
+  margin-top: 10px;
+  padding: 12px 22px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.45);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* ===== Loader ===== */
+#loader {
+  margin-top: 12px;
+  font-weight: 700;
+  color: #374151;
+}
+
+/* ===== Output ===== */
+.output {
+  margin-top: 18px;
+}
+
+.output h3 {
+  margin: 0 0 6px;
+  color: #111827;
+  font-size: 1.05rem;
+}
+
+#result {
+  background: #f3f4f6;
+  padding: 14px 12px;
+  border-radius: 10px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2933;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 480px) {
+  .card {
+    width: 95%;
+    padding: 22px 18px 24px;
+  }
+
+  .card h1 {
+    font-size: 1.6rem;
+  }
+}
