@@ -1,0 +1,44 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs & temp files
+*.log
+*.db
+
+# Virtual environments
+.env
+.venv
+venv/
+env/
+
+# Git
+.git/
+.gitignore
+
+# Node
+node_modules/
+
+# Uploaded / runtime files
+uploads/
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Training / raw data
+data/
+*.zip
+
+# Model backups
+*.h5.bak
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Tool caches
+.pytest_cache/
+.mypy_cache/
