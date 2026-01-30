@@ -206,7 +206,7 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-.github/*
+
 data/*
 landmark_data/*
 sign-lang-deployment.txt

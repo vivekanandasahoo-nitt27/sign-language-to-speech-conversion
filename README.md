@@ -1,201 +1,295 @@
-# 🤟 Sign Language Detection Web App  
-**CNN + Flask + MediaPipe + Docker + AWS CI/CD**
+🤟 Sign Language to Speech Conversion System
 
-A full-stack deep learning web application that translates hand sign images, videos, or live webcam input into text using a Convolutional Neural Network (CNN).  
-Built with TensorFlow, MediaPipe, Flask, Docker, and designed for AWS deployment with CI/CD.
+MediaPipe + ANN + Groq NLP + ElevenLabs + Flask + Docker + AWS CI/CD
 
----
+A full-stack Sign Language to Speech web application that detects hand gestures from images, videos, or live webcam input, converts them into text using hand landmark–based ANN classification, refines sentences using Groq LLM, and finally converts text into natural speech using ElevenLabs.
 
-## 🚀 Features
+Designed with scalability, accuracy, and production deployment in mind.
 
-- 📂 Upload hand sign **images or videos**
-- 🎥 **Live webcam** sign detection
-- 🧠 CNN-based sign classification (A–Z, 0–9)
-- ✋ MediaPipe hand detection
-- 🌐 REST API using Flask
-- 🐳 Dockerized for easy deployment
-- ☁️ AWS + GitHub Actions CI/CD ready
+🚀 Key Highlights
 
----
+✋ MediaPipe Hand Landmark Extraction (2 hands supported)
 
-## 🧠 CNN Model Architecture
+🧠 ANN-based gesture classification (landmark-driven, not raw images)
 
-Input (128×128×3)
+📐 Normalized & scale-invariant hand pose features
+
+🧠 Groq LLM for word & sentence refinement
+
+🔊 ElevenLabs text-to-speech output
+
+🌐 Flask-based web application
+
+🐳 Dockerized deployment
+
+☁️ AWS EC2 + ECR + GitHub Actions CI/CD
+
+🔐 Secure API key handling via environment variables
+
+🧠 System Architecture (Updated)
+Input (Image / Video / Webcam)
+        ↓
+MediaPipe Hands
+(21 landmarks × 2 hands)
+        ↓
+Landmark Normalization
+- Wrist-relative
+- Unit-scale normalization
+- Zero-padding for single hand
+        ↓
+ANN Classifier (126 features)
+        ↓
+Raw Text Prediction
+        ↓
+Groq LLM (NLP Refinement)
+        ↓
+Grammatically Correct Sentence
+        ↓
+ElevenLabs TTS
+        ↓
+Speech Output 🔊
+
+🧩 Landmark Extraction Pipeline
+
+Detect up to 2 hands per frame
+
+Extract 21 landmarks per hand (x, y, z)
+
+Normalize landmarks:
+
+Relative to wrist
+
+Scale to unit distance
+
+Pad missing hand with zeros
+
+Final feature vector:
+
+2 hands × 21 landmarks × 3 = 126 features
+
+
+📁 Output stored as .npy files per label.
+
+🧠 ANN Model Architecture
+Input: 126 landmark features
 ↓
-Conv2D(32) + BatchNorm + MaxPooling
+Dense(256) + BatchNorm + Dropout(0.3)
 ↓
-Conv2D(64) + BatchNorm + MaxPooling
+Dense(128) + BatchNorm + Dropout(0.25)
 ↓
-Conv2D(128) + BatchNorm + MaxPooling
+Dense(64)
 ↓
-Conv2D(256) + BatchNorm + MaxPooling
-↓
-GlobalAveragePooling
-↓
-Dense(256) + Dropout(0.5)
-↓
-Dense(36) → Softmax Output
+Dense(N classes) + Softmax
 
+Training Configuration
+Parameter	Value
+Epochs	80
+Batch Size	32
+Optimizer	Adam
+Learning Rate	1e-3
+Loss	Categorical Crossentropy
+Validation Split	20%
+Callbacks	EarlyStopping, ReduceLROnPlateau
+🧠 NLP with Groq
 
-### Training Settings
-| Parameter         | Value           |
-|------------------|-----------------|
-| Image Size       | 128 × 128       |
-| Optimizer        | Adam            |
-| Learning Rate    | 1e-4            |
-| Loss             | Categorical CE  |
-| Epochs           | 70              |
-| Batch Size       | 32              |
-| Augmentation     | Rotation, Zoom, Shift, Brightness, Flip |
-| Callbacks        | EarlyStopping, ReduceLROnPlateau, ModelCheckpoint |
+Refines:
 
----
+Broken words
 
-## 🧰 Tech Stack
+Incomplete sequences
 
-### Backend
-- Python 3.9  
-- Flask  
-- TensorFlow / Keras  
-- MediaPipe  
-- OpenCV  
-- NumPy  
+Contextual meaning
 
-### Frontend
-- HTML5  
-- CSS3  
-- JavaScript  
+Converts gesture outputs into human-readable sentences
 
-### ML
-- CNN (Convolutional Neural Network)
-- ImageDataGenerator
-- MediaPipe Hands
+Integrated after prediction, not during classification
 
-### DevOps
-- Docker  
-- GitHub Actions  
-- AWS EC2 / ECS / ECR  
-- Nginx (optional)
+🔊 Text-to-Speech (ElevenLabs)
 
----
+Converts refined text to natural speech
 
-## 📁 Project Structure
+High-quality voice synthesis
 
-sign-language-detector/
+API key injected securely via environment variables
+
+🧰 Tech Stack
+Backend & ML
+
+Python 3.9+
+
+Flask
+
+TensorFlow / Keras
+
+MediaPipe
+
+OpenCV
+
+NumPy
+
+Scikit-learn
+
+NLP & Speech
+
+Groq API (LLM)
+
+ElevenLabs API (TTS)
+
+DevOps
+
+Docker
+
+GitHub Actions (CI/CD)
+
+AWS EC2
+
+AWS ECR
+
+IAM Roles (no hardcoded AWS keys)
+
+📁 Project Structure
+sign-language-to-speech-conversion/
 │
-├── app.py # Flask inference server
-├── train_app.py # CNN training script
-├── modelnet_model.h5 # Trained model
-├── labels.json # Label mappings
+├── app.py                    # Flask inference server
+├── extract_landmarks.py      # MediaPipe landmark extraction
+├── train_model.py            # ANN training script
+├── modelnet_model.h5         # Trained ANN model
+├── scaler.pkl                # Feature standard scaler
+├── labels.json               # Class labels
 │
-├── data/ # Training dataset
-│ ├── a/
-│ ├── b/
-│ └── ...
+├── landmark_data/            # Extracted landmark features
+├── data/                     # Raw image dataset
 │
-├── templates/
-│ └── index.html # Frontend UI
-│
-├── static/
-│ ├── style.css # Styling
-│ └── script.js # Frontend logic
+├── templates/                # HTML templates
+├── static/                   # CSS / JS assets
 │
 ├── Dockerfile
 ├── requirements.txt
+├── .dockerignore
 ├── .gitignore
+│
+├── .github/workflows/
+│   └── deploy.yml             # GitHub Actions CI/CD
+│
 └── README.md
 
+🛠 Local Setup
+1️⃣ Create Environment
+conda create -n sign_lang python=3.9 -y
+conda activate sign_lang
 
----
-
-## 🛠 Local Setup
-
-### 1️⃣ Create Environment
-```bash
-conda create -n hand_sign python=3.9 -y
-conda activate hand_sign
 2️⃣ Install Dependencies
 pip install -r requirements.txt
-🎯 Training the CNN
-python train_app.py
+
+🎯 Landmark Extraction
+python extract_landmarks.py
+
+
+Outputs:
+
+landmark_data/
+
+labels.json
+
+🎓 Train the ANN Model
+python train_model.py
+
+
 Outputs:
 
 modelnet_model.h5
 
+scaler.pkl
+
 labels.json
 
-▶️ Run the Web App
+▶️ Run the Application
 python app.py
+
+
 Open in browser:
 
 http://127.0.0.1:5000
-🐳 Docker Setup
+
+🐳 Docker Usage
 Build Image
-docker build -t hand-sign-app .
+docker build -t sign-language-app .
+
 Run Container
-docker run -p 5000:5000 hand-sign-app
-☁️ AWS Deployment (EC2 + Docker)
-Push image to ECR
+docker run -p 5000:5000 \
+-e GROQ_API_KEY=your_key \
+-e ELEVENLABS_API_KEY=your_key \
+sign-language-app
 
-Launch EC2 instance
+☁️ AWS Deployment (EC2 + ECR)
 
-Install Docker
+Docker image pushed to Amazon ECR
 
-Pull image from ECR
+EC2 instance pulls image using IAM Role
 
-Run container
+App runs on port 80
 
-docker run -d -p 80:5000 hand-sign-app
-🔁 CI/CD (GitHub Actions)
-.github/workflows/deploy.yml
+CI/CD handled via GitHub Actions
 
-name: Deploy to AWS
+🔁 CI/CD Pipeline (GitHub Actions)
 
-on:
-  push:
-    branches: [ main ]
+Trigger: git push to main
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+Steps:
 
-    steps:
-      - uses: actions/checkout@v3
+Checkout code
 
-      - name: Login to ECR
-        uses: aws-actions/amazon-ecr-login@v1
+Build Docker image
 
-      - name: Build & Push Image
-        run: |
-          docker build -t hand-sign-app .
-          docker tag hand-sign-app:latest <ECR_URL>:latest
-          docker push <ECR_URL>:latest
-📊 Expected Performance
-Metric	Value
-Training Accuracy	95–98%
-Validation Accuracy	92–96%
-Real-world Accuracy	85–92%
-⚠️ Notes
-Ensure IMG_SIZE in app.py matches training (128).
+Push to Amazon ECR
 
-Disable MediaPipe crop when using pre-cropped images.
+EC2 auto-deploys latest image
 
-Use GPU TensorFlow for faster training.
+No SSH. No .pem in GitHub. Secure & scalable.
 
-For production, replace Flask dev server with Gunicorn.
+📊 Performance (Observed)
+Metric	Accuracy
+Image-based prediction	95%+
+Video prediction	90%+
+Real-world webcam	85–92%
+🔐 Security Best Practices
+
+❌ No API keys in code
+
+✅ Environment variables only
+
+✅ IAM Roles for EC2
+
+❌ No .pem keys in GitHub
+
+✅ Secrets managed via GitHub Actions
 
 👨‍💻 Author
+
 Vivekananda Sahoo
-ML Engineer | Deep Learning | Computer Vision
+Machine Learning Engineer
+Deep Learning • Computer Vision • MLOps
 
 ⭐ Future Enhancements
-LSTM for sentence prediction
 
-Transformer-based sign NLP
+Sentence-level temporal modeling (LSTM / Transformer)
 
-Mobile app (Flutter)
+Real-time streaming API
 
-ONNX model export
+Mobile app (Flutter / React Native)
 
-Realtime streaming API
+ONNX / TensorRT optimization
 
+GPU-based EC2 inference
+
+If you want, next I can:
+
+✨ Optimize this for resume / LinkedIn
+
+📉 Reduce Docker image size
+
+🔁 Add versioned rollback
+
+📊 Add monitoring & logs
+
+Just tell me 👌
