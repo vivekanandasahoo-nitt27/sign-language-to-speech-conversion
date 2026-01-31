@@ -26,6 +26,8 @@ RUN pip install --upgrade pip \
 # ---------- Copy project ----------
 COPY . .
 
+
+RUN mkdir -p uploads static/audio
 # ---------- Flask port ----------
 EXPOSE 5000
 

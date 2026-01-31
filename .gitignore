@@ -210,3 +210,7 @@ __marimo__/
 data/*
 landmark_data/*
 sign-lang-deployment.txt
+
+# Runtime-generated files
+uploads/*
+static/audio/*

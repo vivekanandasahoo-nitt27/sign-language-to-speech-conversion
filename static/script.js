@@ -14,6 +14,7 @@ const webcam = document.getElementById("webcam");
 const predictBtn = document.getElementById("predictBtn");
 const loader = document.getElementById("loader");
 const resultBox = document.getElementById("result");
+const audioPlayer = document.getElementById("ttsAudio");
 
 // ===== Tabs =====
 uploadTab.addEventListener("click", () => {
@@ -95,7 +96,7 @@ async function startWebcam() {
 // ===== Predict Button =====
 predictBtn.addEventListener("click", async () => {
   loader.classList.remove("hidden");
-  lastPrediction = "";
+  
 
   try {
     const formData = new FormData();
@@ -125,17 +126,8 @@ predictBtn.addEventListener("click", async () => {
       body: formData,
     });
 
-    const text = await response.text();  // 🔥 CRITICAL FIX
+    const data = await response.json();  // ✅ SAFE
 
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      console.error("❌ Server returned non-JSON:", text);
-      alert("Server error. Check Flask terminal.");
-      loader.classList.add("hidden");
-      return;
-    }
 
     // 🔥 FIX: Handle both response styles safely
     const resultText =
@@ -145,11 +137,24 @@ predictBtn.addEventListener("click", async () => {
       data.error ||
       "No result";
 
+    const previousText = lastPrediction;
     typeText(resultText);
+
+    // 🔊 Autoplay only if prediction changed
+    if (data.audio && resultText !== previousText) {
+      try {
+        audioPlayer.pause();
+        audioPlayer.src = data.audio;
+        audioPlayer.currentTime = 0;
+        audioPlayer.play();
+      } catch (audioErr) {
+        console.warn("Audio play failed:", audioErr);
+      }
+    }
 
   } catch (err) {
     console.error("❌ Network / JS Error:", err);
-    alert("Error contacting server!");
+    alert("⚠️ Frontend error. Check console.");
   }
 
   loader.classList.add("hidden");

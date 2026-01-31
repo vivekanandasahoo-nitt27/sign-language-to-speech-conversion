@@ -1,38 +1,32 @@
-import pyttsx3
-import time
+import os
+import uuid
+from elevenlabs import ElevenLabs
 
-class SpeechEngine:
-    def __init__(self, rate=170, volume=1.0, cooldown=2.0):
-        self.rate = rate
-        self.volume = volume
-        self.cooldown = cooldown
-        self.last_spoken_text = None
-        self.last_spoken_time = 0
-        self._init_engine()
+# ✅ Use valid voice_id (free-tier compatible)
+VOICE_ID = "21m00Tcm4TlvDq8ikWAM"
 
-    def _init_engine(self):
-        self.engine = pyttsx3.init(driverName="sapi5")
-        self.engine.setProperty("rate", self.rate)
-        self.engine.setProperty("volume", self.volume)
+def text_to_speech(text):
+    api_key = os.getenv("ELEVEN_API_KEY")
+    if not api_key:
+        raise RuntimeError("❌ ELEVEN_API_KEY not found")
 
-        voices = self.engine.getProperty("voices")
-        if voices:
-            self.engine.setProperty("voice", voices[0].id)
+    client = ElevenLabs(api_key=api_key)
 
-    def speak(self, text):
-        now = time.time()
+    # Generate audio stream
+    audio_stream = client.text_to_speech.convert(
+        voice_id=VOICE_ID,
+        text=text,
+        model_id="eleven_turbo_v2"
+    )
 
-        if text == self.last_spoken_text and (now - self.last_spoken_time) < self.cooldown:
-            return
+    # Save audio to static folder
+    os.makedirs("static/audio", exist_ok=True)
+    filename = f"{uuid.uuid4()}.mp3"
+    file_path = os.path.join("static", "audio", filename)
 
-        self.last_spoken_text = text
-        self.last_spoken_time = now
+    with open(file_path, "wb") as f:
+        for chunk in audio_stream:
+            f.write(chunk)
 
-        try:
-            self.engine.say(text)
-            self.engine.runAndWait()
-        except RuntimeError:
-            # re-init engine if it silently fails
-            self._init_engine()
-            self.engine.say(text)
-            self.engine.runAndWait()
+    # ✅ RETURN URL (NOT FILESYSTEM PATH)
+    return f"/static/audio/{filename}"

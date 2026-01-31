@@ -1,6 +1,7 @@
 import os
 from flask import Flask, request, jsonify, render_template
 from werkzeug.utils import secure_filename
+from speech import text_to_speech
 
 # ===== IMPORT YOUR WORKING FUNCTIONS =====
 from predictor import predict_video, predict_image
@@ -14,7 +15,7 @@ ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "mp4", "avi", "mov", "mkv"}
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
@@ -36,56 +37,70 @@ def predict_image_route():
         return jsonify({"error": "No file received"}), 400
 
     file = request.files["file"]
-
     if file.filename == "":
         return jsonify({"error": "Empty filename"}), 400
 
-    path = os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
+    # ✅ define path
+    path = os.path.join(
+        app.config["UPLOAD_FOLDER"],
+        secure_filename(file.filename)
+    )
+
+    # ✅ save file
     file.save(path)
 
-    prediction = predict_image(path)
-    os.remove(path)
+    try:
+        prediction = predict_image(path)
+        audio_url = text_to_speech(prediction)
 
-    #speaker.speak(prediction)
-    # if prediction not in ["Uncertain", "No hand detected"]:
-    #     try:
-    #         speaker.speak(prediction)
-    #     except Exception as e:
-    #         print("🔇 Speech error:", e)
-    return jsonify({"prediction": prediction})
+        return jsonify({
+            "prediction": prediction,
+            "audio": audio_url
+        })
+
+    except Exception as e:
+        print("❌ ERROR predict_image:", e)
+        return jsonify({"error": "backend error"}), 500
+
+    finally:
+        # ✅ always cleanup
+        if os.path.exists(path):
+            os.remove(path)
+
 
 
 
 # ---------- VIDEO ----------
 @app.route("/predict_video", methods=["POST"])
 def predict_video_route():
-    print("🎥 Video route hit")   # ADD THIS
+    try:
+        if "file" not in request.files:
+            return jsonify({"error": "No file received"}), 400
 
-    if "file" not in request.files:
-        print("❌ No file in request.files")
-        return jsonify({"error": "No file received"}), 400
+        file = request.files["file"]
+        if file.filename == "":
+            return jsonify({"error": "Empty filename"}), 400
 
-    file = request.files["file"]
-    print("📁 Received file:", file.filename)  # ADD THIS
+        path = os.path.join(
+            app.config["UPLOAD_FOLDER"],
+            secure_filename(file.filename)
+        )
+        file.save(path)
 
-    if file.filename == "":
-        return jsonify({"error": "Empty filename"}), 400
+        prediction = predict_video(path)
+        os.remove(path)
 
-    path = os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
-    file.save(path)
+        audio_url = text_to_speech(prediction)
 
-    print("✅ Saved video to:", path)  # ADD THIS
+        return jsonify({
+            "prediction": prediction,
+            "audio": audio_url
+        })
 
-    prediction = predict_video(path)
-    os.remove(path)
-    # if prediction not in ["No signs detected"]:
-    #     try:
-    #         speaker.speak(prediction)
-    #     except Exception as e:
-    #         print("🔇 Speech error:", e)
-
-
-    return jsonify({"prediction": prediction})
+    except Exception as e:
+        print("❌ predict_video error:", e)
+        return jsonify({"error": "backend error"}), 500
+   
 
 # ===== RUN =====
 if __name__ == "__main__":

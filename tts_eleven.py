@@ -1,23 +1,29 @@
 import os
+import uuid
 from elevenlabs import ElevenLabs
 
-class ElevenTTSEngine:
-    def __init__(self, voice="Rachel"):
-        api_key = os.getenv("ELEVEN_API_KEY")
-        if not api_key:
-            raise RuntimeError("❌ ELEVEN_API_KEY not set")
+VOICE_ID = "21m00Tcm4TlvDq8ikWAM"   # example: Rachel's actual ID
+OUTPUT_FILE = "elevenlabs_tts_test.mp3"
 
-        self.client = ElevenLabs(api_key=api_key)
-        self.voice = voice
+def text_to_speech(text):
+    api_key = os.getenv("ELEVEN_API_KEY")
+    if not api_key:
+        raise RuntimeError("ELEVEN_API_KEY not found")
 
-    def synthesize(self, text, out_path="output.mp3"):
-        audio = self.client.text_to_speech.convert(
-            voice_id=self.voice,
-            text=text,
-            model_id="eleven_monolingual_v1"
-        )
+    client = ElevenLabs(api_key=api_key)
 
-        with open(out_path, "wb") as f:
-            f.write(audio)
+    audio_stream = client.text_to_speech.convert(
+        voice_id=VOICE_ID,
+        text=text,
+        model_id="eleven_turbo_v2"
+    )
 
-        return out_path
+    os.makedirs("static/audio", exist_ok=True)
+    filename = f"{uuid.uuid4()}.mp3"
+    out_path = f"static/audio/{filename}"
+
+    with open(out_path, "wb") as f:
+        for chunk in audio_stream:
+            f.write(chunk)
+
+    return out_path

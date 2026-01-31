@@ -136,3 +136,7 @@ def predict_video(video_path):
         corrected_word = raw_word
 
     return corrected_word
+
+
+
+
