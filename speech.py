@@ -4,6 +4,8 @@ from elevenlabs import ElevenLabs
 
 # ✅ Use valid voice_id (free-tier compatible)
 VOICE_ID = "21m00Tcm4TlvDq8ikWAM"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+AUDIO_DIR = os.path.join(BASE_DIR, "static", "audio")
 
 def text_to_speech(text):
     api_key = os.getenv("ELEVEN_API_KEY")
@@ -20,9 +22,9 @@ def text_to_speech(text):
     )
 
     # Save audio to static folder
-    os.makedirs("static/audio", exist_ok=True)
+    os.makedirs(AUDIO_DIR, exist_ok=True)
     filename = f"{uuid.uuid4()}.mp3"
-    file_path = os.path.join("static", "audio", filename)
+    file_path = os.path.join(AUDIO_DIR, filename)
 
     with open(file_path, "wb") as f:
         for chunk in audio_stream:
