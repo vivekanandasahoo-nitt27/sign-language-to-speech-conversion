@@ -53,6 +53,10 @@ Speech Output 🔊
 
 ---
 
+## 📊 Data Augmentation
+
+To improve model generalization, data augmentation was applied to the hand sign dataset before feature extraction. Controlled transformations such as horizontal flipping, small rotations, shift, scaling, brightness variation, and slight blur were used to simulate real-world conditions. Since the model relies on MediaPipe hand landmarks, additional landmark-level augmentation including rotation, translation, scaling, and noise injection was performed. This strategy helps the model handle variations in hand orientation, lighting, user differences, and detection noise, resulting in more stable and accurate real-time sign recognition.
+
 ## ✋ Landmark Extraction Pipeline
 
 - Detect up to **2 hands per frame**
