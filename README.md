@@ -101,16 +101,49 @@ Callbacks | EarlyStopping, ReduceLROnPlateau |
 
 ---
 
-## 🧠 NLP with Groq
 
-- Refines:
-  - Broken words
-  - Partial predictions
-  - Contextual meaning
-- Converts raw gesture outputs into **human-readable sentences**
-- Applied **after classification**, not during model inference
+ ## 🔐 Authentication & Sessions (V2)
 
----
+V2 introduces session-based authentication to support multi-user access and context-aware predictions.
+
+Login & registration with Flask
+
+User session stored using session["user_id"]
+
+Protected prediction page (login required)
+
+Logout clears session
+
+Enables user-specific prediction history
+
+## 🧠 Context-Aware NLP (V2)
+
+Predicted words are refined into natural sentences using Groq LLM with user memory context.
+
+Grammar enhancement from gesture words
+
+Uses recent user history for consistency
+
+Prevents conversational / assistant-style replies
+
+Returns sentence only (deterministic output)
+
+Pipeline:
+
+Gesture → ANN Prediction → User Memory → Groq NLP → Final Sentence
+
+## 🗂 Memory Layer
+
+Each user maintains a short rolling history of generated sentences.
+
+Used for:
+
+Meaning continuity
+
+Pronoun & tense consistency
+
+Multi-gesture sentence completion
+
 
 ## 🔊 Text-to-Speech (ElevenLabs)
 
