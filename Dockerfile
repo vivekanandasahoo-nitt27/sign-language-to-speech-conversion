@@ -1,8 +1,11 @@
 FROM python:3.9-slim
 
+# Prevent Python from buffering stdout/stderr
 ENV PYTHONUNBUFFERED=1
 
 # ---------- System dependencies ----------
+# - libgl1 / libglib2.0-0 → required by OpenCV
+# - ffmpeg → required for video processing
 RUN apt-get update && apt-get install -y \
     build-essential \
     libgl1 \
@@ -13,19 +16,19 @@ RUN apt-get update && apt-get install -y \
 # ---------- App directory ----------
 WORKDIR /app
 
-# ---------- Install deps (cache friendly) ----------
+# ---------- Install Python deps first (cache-friendly) ----------
 COPY requirements.txt .
+
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir --default-timeout=1000 -r requirements.txt
 
 # ---------- Copy project ----------
 COPY . .
 
-# ---------- Runtime dirs ----------
-RUN mkdir -p uploads_v2 static/audio
+RUN mkdir -p uploads static/audio
 
 # ---------- Flask port ----------
-EXPOSE 5001
+EXPOSE 5000
 
-# ⭐ IMPORTANT — run as module (supports v2 imports)
-CMD ["python", "-m", "v2.app_v2"]
+# ---------- Run Flask ----------
+CMD ["python", "app.py"]
