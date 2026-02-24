@@ -214,3 +214,5 @@ sign-lang-deployment.txt
 # Runtime-generated files
 uploads/*
 static/audio/*
+
+uploads_v2/*

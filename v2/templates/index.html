@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sign Language V2</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="card">
+<h1>🤟 Sign Language Translator</h1>
+<button id="logoutBtn" class="logout-btn">Logout</button>
+
+<div class="tabs">
+<button id="uploadTab" class="active">📂 Upload Video</button>
+<button id="liveTab">🎥 Live Webcam</button>
+</div>
+
+<div id="uploadSection" class="section">
+<div id="dropZone">
+<p>📂 Drag & Drop or Click</p>
+<input type="file" id="mediaUpload" accept="video/*" hidden>
+</div>
+<div id="preview"></div>
+</div>
+
+<div id="liveSection" class="section hidden">
+<video id="webcam" autoplay playsinline muted></video>
+</div>
+
+<button id="predictBtn">Translate</button>
+<div id="loader" class="hidden">Processing…</div>
+
+<div class="output">
+<h3>Sentence</h3>
+<div id="result">---</div>
+
+
+</div>
+</div>
+
+<audio id="ttsAudio"></audio>
+
+<script src="{{ url_for('static', filename='script_v2.js') }}"></script>
+</body>
+</html>
